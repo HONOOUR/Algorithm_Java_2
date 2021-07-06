@@ -7,9 +7,134 @@ import java.util.stream.Collectors;
 public class Main {
 
     public static void main(String[] args) {
+        solution("aabcbcd", "abc");
+        getStrings("abcxyqwertyxyabc");
+        int[] prices = {13000, 88000, 10000};
+        int[] discounts = {30, 20};
+        minPrice(prices, discounts);
+        int[][] costs = {{0,1,1},{0,2,2},{1,2,5},{1,3,1},{2,3,8}};
+        getMinCosts(4, costs);
         int[] people = {70, 50, 80, 50};
         getMinBoat(people, 100);
         getMaxNumber("4177252841", 4);
+    }
+
+    public static int solution(String s, String t) {
+        int result = -1;
+        String[] strings = s.split("");
+        ArrayList<String> tmp = new ArrayList<>();
+        for (String i: strings) {
+            tmp.add(i);
+        }
+        int count = 0;
+        int i = 0;
+        int j = i + t.length()-1;
+        while(j <= tmp.size()) {
+            String temp = "";
+            for (int start = i; start <= j; start++) {
+                temp += tmp.get(start);
+            }
+            if (temp.equals(t)) {
+                for (int x = j; x >= i; x--) {
+                    tmp.remove(x);
+                }
+                i = 0;
+                j = i + t.length() -1;
+                ++ count;
+            } else {
+                ++ i;
+                j = i + t.length() -1;
+            }
+        }
+        if (count != 0) {
+            result = count;
+        }
+        return result;
+    }
+
+    public static String[] getStrings(String s) {
+        ArrayList<String> tmp = new ArrayList<>();
+        String[] strings = s.split("");
+        int j = strings.length -1;
+        int start = 0;
+        int end = 0;
+        while (end < j) {
+            if (!strings[end].equals(strings[j])) {
+                ++end;
+            } else {
+                String temp = "";
+                for (int sub = start; sub <=end; sub++) {
+                    temp += strings[sub];
+                    --j;
+                }
+                tmp.add(temp);
+                ++end;
+                start = end;
+            }
+        }
+        ArrayList<String> tmp2 = new ArrayList<>();
+        for (String t: tmp) {
+            tmp2.add(t);
+        }
+        if (start != end) {
+            String temp = "";
+            for (int sub = start; sub <=end; sub++) {
+                temp += strings[sub];
+                --j;
+            }
+            tmp2.add(temp);
+        }
+
+        String[] answer = new String[tmp2.size() + tmp.size()];
+        for (int x = 0; x<tmp2.size(); x++) {
+            answer[x] = tmp2.get(x);
+        }
+        int i = 0;
+        for (int y = tmp.size()-1; y >= 0; y--) {
+            answer[tmp2.size() + i] = tmp.get(y);
+            i++;
+        }
+
+        return answer;
+    }
+    public static int minPrice(int[] prices, int[] discounts) {
+        int answer = 0;
+        Arrays.sort(prices);
+        Arrays.sort(discounts);
+        int index = discounts.length -1;
+        for (int i = prices.length-1; i >=0; i--) {
+            if (index >= 0) {
+                answer += (prices[i] * (100-discounts[index]) * 0.01);
+                --index;
+            } else {
+                answer += prices[i];
+            }
+        }
+        return answer;
+    }
+
+    public static int getMinCosts(int n, int[][] costs) {
+        int answer = 0;
+        Arrays.sort(costs, (a, b) -> Integer.compare(a[2], b[2]));
+        int[] visited = new int[n];
+        for (int[] cost: costs) {
+            int a = cost[0];
+            int b = cost[1];
+            if (visited[a] == 0 && visited[b] == 0) {
+                visited[a] = 1;
+                visited[b] = 1;
+                answer += cost[2];
+            } else if (visited[a] == 0) {
+                visited[a] = 1;
+                answer += cost[2];
+            } else if (visited[b] == 0) {
+                visited[b] = 1;
+                answer += cost[2];
+            } else {
+                continue;
+            }
+        }
+        return answer;
     }
 
     public static int getMinBoat(int[] people, int limit) {
