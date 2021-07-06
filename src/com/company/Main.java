@@ -7,11 +7,11 @@ import java.util.stream.Collectors;
 public class Main {
 
     public static void main(String[] args) {
-        solution("aabcbcd", "abc");
+        getRemoveCount("aabcbcd", "abc");
         getStrings("abcxyqwertyxyabc");
         int[] prices = {13000, 88000, 10000};
         int[] discounts = {30, 20};
-        minPrice(prices, discounts);
+        getMinPrice(prices, discounts);
         int[][] costs = {{0,1,1},{0,2,2},{1,2,5},{1,3,1},{2,3,8}};
         getMinCosts(4, costs);
         int[] people = {70, 50, 80, 50};
@@ -19,7 +19,7 @@ public class Main {
         getMaxNumber("4177252841", 4);
     }
 
-    public static int solution(String s, String t) {
+    public static int getRemoveCount(String s, String t) {
         int result = -1;
         String[] strings = s.split("");
         ArrayList<String> tmp = new ArrayList<>();
@@ -52,61 +52,65 @@ public class Main {
         return result;
     }
 
+
+    // 시작 문자에 포인터, 끝 문자에 포인터 -> two pointer 사용
     public static String[] getStrings(String s) {
         ArrayList<String> tmp = new ArrayList<>();
         String[] strings = s.split("");
-        int j = strings.length -1;
+        int stringLength = strings.length -1;
         int start = 0;
         int end = 0;
-        while (end < j) {
-            if (!strings[end].equals(strings[j])) {
+        while (end < stringLength) {
+            if (!strings[end].equals(strings[stringLength])) {
                 ++end;
             } else {
                 String temp = "";
                 for (int sub = start; sub <=end; sub++) {
                     temp += strings[sub];
-                    --j;
+                    --stringLength; // 좌우 같은 문자열 확
                 }
                 tmp.add(temp);
                 ++end;
                 start = end;
             }
         }
-        ArrayList<String> tmp2 = new ArrayList<>();
+        ArrayList<String> temp_left = new ArrayList<>();
         for (String t: tmp) {
-            tmp2.add(t);
+            temp_left.add(t);
         }
         if (start != end) {
             String temp = "";
             for (int sub = start; sub <=end; sub++) {
                 temp += strings[sub];
-                --j;
+                --stringLength;
             }
-            tmp2.add(temp);
+            temp_left.add(temp);
         }
 
-        String[] answer = new String[tmp2.size() + tmp.size()];
-        for (int x = 0; x<tmp2.size(); x++) {
-            answer[x] = tmp2.get(x);
+        String[] answer = new String[temp_left.size() + tmp.size()];
+        for (int x = 0; x < temp_left.size(); x ++) {
+            answer[x] = temp_left.get(x);
         }
         int i = 0;
-        for (int y = tmp.size()-1; y >= 0; y--) {
-            answer[tmp2.size() + i] = tmp.get(y);
+        for (int y = tmp.size()-1; y >= 0; y--) { // 역순으로 들어와야함
+            answer[temp_left.size() + i] = tmp.get(y);
             i++;
         }
 
         return answer;
     }
-    public static int minPrice(int[] prices, int[] discounts) {
+
+    // 가장 높 가격에 가장 큰 할인율 적용
+    public static int getMinPrice(int[] prices, int[] discounts) {
         int answer = 0;
         Arrays.sort(prices);
         Arrays.sort(discounts);
-        int index = discounts.length -1;
+        int discounts_index = discounts.length -1;
         for (int i = prices.length-1; i >=0; i--) {
-            if (index >= 0) {
-                answer += (prices[i] * (100-discounts[index]) * 0.01);
-                --index;
-            } else {
+            if (discounts_index >= 0) {
+                answer += (prices[i] * (100-discounts[discounts_index]) * 0.01);
+                --discounts_index;
+            } else { // no more coupon
                 answer += prices[i];
             }
         }
